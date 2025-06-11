@@ -20,6 +20,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v3
