@@ -3,7 +3,7 @@ resource "aws_subnet" "public_a" {
   cidr_block              = var.public_subnets[0]
   availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
-  tags = { Name = "public-a" }
+  tags                    = { Name = "public-a" }
 }
 
 resource "aws_subnet" "public_b" {
@@ -11,21 +11,21 @@ resource "aws_subnet" "public_b" {
   cidr_block              = var.public_subnets[1]
   availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
-  tags = { Name = "public-b" }
+  tags                    = { Name = "public-b" }
 }
 
 resource "aws_subnet" "private_a" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.private_subnets[0]
   availability_zone = var.availability_zones[0]
-  tags = { Name = "private-a" }
+  tags              = { Name = "private-a" }
 }
 
 resource "aws_subnet" "private_b" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.private_subnets[1]
   availability_zone = var.availability_zones[1]
-  tags = { Name = "private-b" }
+  tags              = { Name = "private-b" }
 }
 
 resource "aws_eip" "nat" {
