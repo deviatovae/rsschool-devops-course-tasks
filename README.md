@@ -1,51 +1,94 @@
-# 🚀 Terraform AWS Infrastructure
+## 🚀 Terraform VPC Setup with Bastion, NAT, IAM, S3, and Security Groups
 
-This repository contains Terraform code to manage AWS infrastructure. It uses:
-- **Terraform v1.6+**
-- **AWS S3** for remote state storage
-- **GitHub Actions** for automated deploys via OIDC
+This project sets up a basic AWS infrastructure including:
 
-## ✅ Prerequisites
+- Custom VPC
+- 2 Public and 2 Private Subnets in 2 AZs
+- Internet Gateway & NAT Gateway
+- Route Tables
+- Network ACLs (allow all for demonstration)
+- Bastion Host for SSH access
+- Security Groups for public and private resources
+- IAM Role(s) and policies
+- S3 bucket for infrastructure use or storage
 
-- [Terraform v1.6+](https://developer.hashicorp.com/terraform/downloads)
-- [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-- Access to an AWS account with appropriate IAM permissions
+---
 
 ## 📁 Project Structure
 
-.github/
-└── workflows/
-    └── terraform.yml        # GitHub Actions workflow
+```bash
+.
+├── provider.tf
+├── variables.tf
+├── terraform.tfvars.example
+├── bastion.tf
+├── iam.tf
+├── s3.tf
+├── security.tf
+├── subnets.tf
+├── vpc.tf
+└── ... (backend, outputs, etc.)
+```
 
-terraform/
-├── backend.tf               # Remote backend (S3) configuration
-├── iam.tf                   # IAM roles and policies
-├── main.tf                  # Provider + versions
-├── s3.tf                    # S3 bucket definition
-├── terraform.tfvars         # Variable values
-├── variables.tf             # Input variable schema
+---
 
-## 🧱 Clone the Repository
+## 🔧 Prerequisites
 
-git clone https://github.com/deviatovae/rsschool-devops-course-tasks.git
-cd rsschool-devops-course-tasks
+- [Terraform >= 1.6.0](https://developer.hashicorp.com/terraform/downloads)
+- AWS credentials configured (`aws configure`, env vars, or OIDC)
+- A key pair created in EC2 → Key Pairs for bastion access
 
-## 🔐 Set Up AWS Credentials
+---
 
-aws configure
+## 📦 Setup Instructions
 
-## 🧰 Initialize Terraform
+1. Clone this repository
 
-cd terraform
+2. Create a `terraform.tfvars` file based on `terraform.tfvars.example`
+
+3. Initialize and apply:
+
+```bash
 terraform init
-
-## 🧪 Plan and Apply
-
 terraform plan
 terraform apply
+```
+---
 
-## 🤖 GitHub Actions
+## 🔐 Security Notes
 
-This repo includes a GitHub Actions workflow (.github/workflows/terraform.yml) that automatically:
-- Executes terraform plan on pull requests to main
-- Executes terraform apply on push to main using secure GitHub OIDC role authentication
+- Bastion host uses wide-open SSH access (`0.0.0.0/0`) by default — restrict for production.
+- IAM roles and policies should be validated per principle of least privilege.
+- S3 access may be public/private depending on bucket policy (review `s3.tf`).
+- Security Groups isolate public/private and control ingress strictly.
+
+---
+
+## 🤖 GitHub Actions CI/CD
+
+This project includes a GitHub Actions workflow to automatically:
+
+- Check Terraform formatting
+- Run `terraform plan` on PRs
+- Run `terraform apply` on push to `main`
+
+### 🔧 Setup Required:
+- Define `AWS_ACCOUNT_ID` in repository secrets
+- Ensure the IAM role `GithubActionsRole` exists and is assumable by GitHub OIDC
+
+### 📄 Example Workflow
+
+Workflow file is located in `.github/workflows/terraform.yml`. It includes format checking, planning on pull requests, and automatic apply on push to `main`.
+
+---
+
+## 🧹 Cleanup
+
+```bash
+terraform destroy
+```
+
+---
+
+## 📘 License
+MIT
