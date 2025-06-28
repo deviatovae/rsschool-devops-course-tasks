@@ -41,6 +41,14 @@ resource "aws_security_group" "private_sg" {
     cidr_blocks = [aws_vpc.main.cidr_block]
   }
 
+  ingress {
+    description = "Allow K3s API from bastion"
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = [var.bastion_ip_cidr]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0

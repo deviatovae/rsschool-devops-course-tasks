@@ -23,3 +23,11 @@ output "bastion_public_ip" {
 output "nat_gateway_id" {
   value = aws_nat_gateway.nat.id
 }
+
+output "k3s_server_ip" {
+  value = aws_instance.k3s_server.private_ip
+}
+
+output "k3s_agent_ip" {
+  value = aws_instance.k3s_agent.private_ip
+}
