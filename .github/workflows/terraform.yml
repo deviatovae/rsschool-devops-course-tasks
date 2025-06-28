@@ -30,6 +30,11 @@ jobs:
     name: Terraform Plan
     runs-on: ubuntu-latest
     needs: terraform-check
+    env:
+      TF_VAR_ami: ${{ secrets.TF_VAR_AMI }}
+      TF_VAR_key_name: ${{ secrets.TF_VAR_NAME }}
+      TF_VAR_k3s_token: ${{ secrets.TF_VAR_K3S_TOKEN }}
+      TF_VAR_bastion_ip_cidr: ${{ secrets.TF_VAR_BASTION_IP_CIDR }}
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
@@ -51,6 +56,11 @@ jobs:
     name: Terraform Apply
     runs-on: ubuntu-latest
     needs: terraform-plan
+    env:
+      TF_VAR_ami: ${{ secrets.TF_VAR_AMI }}
+      TF_VAR_key_name: ${{ secrets.TF_VAR_NAME }}
+      TF_VAR_k3s_token: ${{ secrets.TF_VAR_K3S_TOKEN }}
+      TF_VAR_bastion_ip_cidr: ${{ secrets.TF_VAR_BASTION_IP_CIDR }}
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
