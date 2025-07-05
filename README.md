@@ -55,6 +55,28 @@ terraform apply
 ```
 ---
 
+### K3s Cluster on AWS
+
+A lightweight K3s Kubernetes cluster deployed using Terraform.
+
+### Components:
+
+- 1 `bastion host` in a **public subnet**
+- 1 `k3s server` in a **private subnet**
+- 1 `k3s agent` in a **private subnet**
+
+## Access
+
+SSH access to the cluster is done via the bastion host:
+
+```bash
+ssh -i ~/.ssh/key.pem -A ubuntu@<bastion-public-ip>
+```
+
+## Verifying the cluster 
+sudo kubectl get nodes
+sudo kubectl get all --all-namespaces
+
 ## 🔐 Security Notes
 
 - Bastion host uses wide-open SSH access (`0.0.0.0/0`) by default — restrict for production.

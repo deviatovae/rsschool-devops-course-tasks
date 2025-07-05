@@ -35,12 +35,23 @@ variable "availability_zones" {
   default     = ["us-east-2a", "us-east-2b"]
 }
 
-variable "bastion_key_name" {
-  description = "SSH key name to use for bastion host"
+variable "key_name" {
+  description = "SSH key name"
   type        = string
 }
 
-variable "bastion_ami" {
-  description = "AMI ID to use for bastion host"
+variable "ami" {
+  description = "AMI ID"
   type        = string
+}
+
+variable "bastion_ip_cidr" {
+  description = "IP-address for Bastion Host"
+  type        = string
+}
+
+variable "k3s_token" {
+  description = "K3s node token from server"
+  type        = string
+  sensitive   = true
 }
