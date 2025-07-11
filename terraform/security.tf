@@ -49,6 +49,14 @@ resource "aws_security_group" "private_sg" {
     cidr_blocks = [var.bastion_ip_cidr]
   }
 
+  ingress {
+    description = "Allow SSH from bastion"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.bastion_ip_cidr]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
