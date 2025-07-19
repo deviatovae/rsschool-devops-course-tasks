@@ -11,6 +11,7 @@ This project sets up a basic AWS infrastructure including:
 - Security Groups for public and private resources
 - IAM Role(s) and policies
 - S3 bucket for infrastructure use or storage
+- Simple Application Deployment with Helm
 
 ---
 
@@ -103,6 +104,42 @@ This project includes a GitHub Actions workflow to automatically:
 Workflow file is located in `.github/workflows/terraform.yml`. It includes format checking, planning on pull requests, and automatic apply on push to `main`.
 
 ---
+
+## Flask Application Overview
+
+A basic Flask app that returns `Hello, World!` on the root URL `/`.
+
+
+---
+
+## 🐳 Build the Docker Image
+
+> **Important**: If you're using Minikube, you must build the image inside its Docker daemon:
+
+```bash
+eval $(minikube docker-env)
+docker build -t flask-app .
+```
+
+## Deploy to Kubernetes
+```bash
+kubectl create namespace flask
+```
+
+## Install Helm chart
+```bash
+helm install flask-app ./flask-app-chart -n flask
+```
+
+## Port forward the service:
+
+```bash
+kubectl port-forward svc/flask-app-flask-app-chart 8080:8080 -n flask
+```
+
+## Open in browser http://localhost:8080 
+
+
 
 ## 🧹 Cleanup
 
