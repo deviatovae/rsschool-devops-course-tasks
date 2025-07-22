@@ -26,7 +26,7 @@ pipeline {
             cd terraform/flask-app
             pip install -r requirements.txt
             pip install pytest coverage
-            coverage run -m pytest --junitxml=report.xml
+            coverage run -m pytest tests/ --junitxml=report.xml
             coverage xml -o coverage.xml
           '''
         }
@@ -72,7 +72,7 @@ pipeline {
       steps {
         container('helm') {
           sh '''
-            helm upgrade --install flask-app flask-app/flask-app-chart \
+            helm upgrade --install flask-app ./flask-app-chart \
               --namespace devops-tools \
               --create-namespace \
               --set image.repository=atatara/flask-app \
