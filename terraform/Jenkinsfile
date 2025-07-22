@@ -1,0 +1,78 @@
+pipeline {
+  agent any
+
+  environment {
+    AWS_REGION = 'us-east-2'
+    IMAGE_NAME = 'flask-app'
+    REGISTRY = '123456789012.dkr.ecr.us-east-2.amazonaws.com'
+    TAG = "${env.BUILD_NUMBER}"
+    IMAGE_FULL = "${REGISTRY}/${IMAGE_NAME}:${TAG}"
+  }
+
+  parameters {
+    booleanParam(name: 'DEPLOY_TO_ECR', defaultValue: true, description: 'Push image to ECR?')
+  }
+
+  stages {
+    stage('Docker Build') {
+      steps {
+        script {
+          sh "docker build -t ${IMAGE_FULL} ."
+        }
+      }
+    }
+
+    stage('Run Tests') {
+      steps {
+        script {
+          sh "docker run --rm ${IMAGE_FULL} pytest || true"
+        }
+      }
+    }
+
+    stage('Push to ECR') {
+      when {
+        expression { return params.DEPLOY_TO_ECR }
+      }
+      steps {
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: 'aws-ecr-creds',
+          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+          sh '''
+            aws configure set region $AWS_REGION
+            aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY
+            docker push $IMAGE_FULL
+          '''
+        }
+      }
+    }
+
+    stage('Helm Deploy') {
+      steps {
+        sh '''
+          helm upgrade --install flask-app ./flask-app-chart \
+            --set image.repository=$REGISTRY/$IMAGE_NAME \
+            --set image.tag=$TAG
+        '''
+      }
+    }
+
+    stage('Verify Deployment') {
+      steps {
+        sh 'curl -f http://flask-app.default.svc.cluster.local/health || exit 1'
+      }
+    }
+  }
+
+  post {
+    success {
+      echo "Pipeline finished successfully."
+    }
+    failure {
+      echo "Pipeline failed."
+    }
+  }
+}

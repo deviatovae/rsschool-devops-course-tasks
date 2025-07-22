@@ -90,3 +90,16 @@ resource "aws_iam_role_policy_attachment" "eventbridge" {
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess"
 }
+
+resource "aws_iam_user" "jenkins" {
+  name = "jenkins-ecr-user"
+}
+
+resource "aws_iam_user_policy_attachment" "ecr_access" {
+  user       = aws_iam_user.jenkins.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+}
+
+resource "aws_iam_access_key" "jenkins" {
+  user = aws_iam_user.jenkins.name
+}

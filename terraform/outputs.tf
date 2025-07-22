@@ -31,3 +31,15 @@ output "k3s_server_ip" {
 output "k3s_agent_ip" {
   value = aws_instance.k3s_agent.private_ip
 }
+
+output "jenkins_aws_access_key_id" {
+  value       = aws_iam_access_key.jenkins.id
+  description = "Jenkins AWS Access Key ID"
+  sensitive   = true
+}
+
+output "jenkins_aws_secret_access_key" {
+  value       = aws_iam_access_key.jenkins.secret
+  description = "Jenkins AWS Secret Access Key"
+  sensitive   = true
+}
