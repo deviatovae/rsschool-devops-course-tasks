@@ -22,13 +22,14 @@ pipeline {
     stage('Install dependencies & run tests') {
       steps {
         container('python') {
-          sh '''
-            cd terraform/flask-app
-            pip install -r requirements.txt
-            pip install pytest coverage
-            coverage run -m pytest tests/ --junitxml=report.xml
-            coverage xml -o coverage.xml
-          '''
+          dir("${APP_DIR}") {
+            sh '''
+              pip install -r requirements.txt
+              pip install pytest coverage
+              coverage run -m pytest tests/ --junitxml=report.xml
+              coverage xml -o coverage.xml
+            '''
+          }
         }
       }
     }
@@ -36,8 +37,8 @@ pipeline {
     stage('SonarQube Analysis') {
       steps {
         container('sonar') {
-          withSonarQubeEnv('SonarQube') {
-            dir("${APP_DIR}") {
+          dir("${APP_DIR}") {
+            withSonarQubeEnv('SonarQube') {
               sh 'sonar-scanner'
             }
           }
@@ -71,13 +72,17 @@ pipeline {
     stage('Helm Deploy') {
       steps {
         container('helm') {
-          sh '''
-            helm upgrade --install flask-app ./flask-app-chart \
-              --namespace devops-tools \
-              --create-namespace \
-              --set image.repository=atatara/flask-app \
-              --set image.tag=${BUILD_NUMBER}
-          '''
+          dir("${APP_DIR}") {
+            sh '''
+              set -eux
+              helm upgrade --install flask-app ./flask-app-chart \
+                --namespace devops-tools \
+                --create-namespace \
+                --set image.repository=atatara/flask-app \
+                --set image.tag=${BUILD_NUMBER}
+              helm status flask-app --namespace devops-tools
+            '''
+          }
         }
       }
     }
